@@ -1,0 +1,89 @@
+spring:
+  application:
+    name: realtime-geo-fencing-service
+
+  # DataSource Configuration
+  datasource:
+    url: jdbc:postgresql://localhost:5432/geofencing
+    username: geofencing_user
+    password: geofencing_pass
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      pool-name: GeoFencingHikariPool
+
+  # JPA Configuration
+  jpa:
+    database-platform: org.hibernate.spatial.dialect.postgis.PostgisPG95Dialect
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+        # Spatial-specific
+        dialect: org.hibernate.spatial.dialect.postgis.PostgisPG95Dialect
+
+  # Redis Configuration
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000ms
+      jedis:
+        pool:
+          max-active: 50
+          max-idle: 20
+          min-idle: 5
+          max-wait: 2000ms
+
+  # WebSocket Configuration
+  websocket:
+    allowed-origins: "*"
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# Application-specific Configuration
+geofencing:
+  cache:
+    zones:
+      ttl-minutes: 60
+      refresh-interval-minutes: 30
+  processing:
+    thread-pool-size: 10
+    queue-capacity: 10000
+  websocket:
+    endpoint: /ws/gps-stream
+    topic-prefix: /topic
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    com.geofencing: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.springframework.data.redis: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
