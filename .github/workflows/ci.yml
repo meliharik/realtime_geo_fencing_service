@@ -60,7 +60,16 @@ jobs:
 
     - name: Wait for Redis to be ready
       run: |
-        timeout 30 bash -c 'until redis-cli -h localhost -p 6379 ping; do sleep 1; done'
+        for i in {1..30}; do
+          if nc -z localhost 6379; then
+            echo "Redis is ready!"
+            exit 0
+          fi
+          echo "Waiting for Redis..."
+          sleep 1
+        done
+        echo "Redis failed to start"
+        exit 1
 
     - name: Build with Maven
       run: mvn clean install -DskipTests
