@@ -2,12 +2,14 @@
 
 # 🌍 Real-Time Geo-Fencing Engine
 
+[![CI/CD](https://github.com/meliharik/realtime_geo_fencing_service/actions/workflows/ci.yml/badge.svg)](https://github.com/meliharik/realtime_geo_fencing_service/actions/workflows/ci.yml)
 [![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.5-6DB33F?style=for-the-badge&logo=spring&logoColor=white)](https://spring.io/projects/spring-boot)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-316192?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/Redis-7.2-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
 [![PostGIS](https://img.shields.io/badge/PostGIS-3.4-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://postgis.net/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
+[![codecov](https://codecov.io/gh/meliharik/realtime_geo_fencing_service/branch/main/graph/badge.svg)](https://codecov.io/gh/meliharik/realtime_geo_fencing_service)
 
 **A high-performance, event-driven geo-fencing service for processing GPS streams from scooter fleets in real-time**
 
@@ -94,7 +96,7 @@ Imagine a city with designated no-parking zones for electric scooters. This syst
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/realtime-geo-fencing-service.git
+git clone https://github.com/meliharik/realtime_geo_fencing_service.git
 cd realtime-geo-fencing-service
 ```
 

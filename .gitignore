@@ -50,4 +50,11 @@ logs/
 postgres_data/
 redis_data/
 
+# Claude Code
 .claude
+
+# GitHub Actions artifacts
+.github/workflows/.history
+
+# Old files
+README_OLD.md

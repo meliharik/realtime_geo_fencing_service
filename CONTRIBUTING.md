@@ -99,11 +99,11 @@ Enhancement suggestions are tracked as GitHub issues.
 
 ```bash
 # Clone your fork
-git clone https://github.com/YOUR_USERNAME/realtime-geo-fencing-service.git
+git clone https://github.com/meliharik/realtime_geo_fencing_service.git
 cd realtime-geo-fencing-service
 
 # Add upstream remote
-git remote add upstream https://github.com/meliharik/realtime-geo-fencing-service.git
+git remote add upstream https://github.com/meliharik/realtime_geo_fencing_service.git
 
 # Start infrastructure
 docker-compose up -d
