@@ -49,3 +49,5 @@ logs/
 # Docker volumes (if using local volumes)
 postgres_data/
 redis_data/
+
+.claude

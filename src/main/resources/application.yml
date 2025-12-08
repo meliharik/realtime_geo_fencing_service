@@ -4,7 +4,7 @@ spring:
 
   # DataSource Configuration
   datasource:
-    url: jdbc:postgresql://localhost:5432/geofencing
+    url: jdbc:postgresql://localhost:5433/geofencing
     username: geofencing_user
     password: geofencing_pass
     driver-class-name: org.postgresql.Driver
