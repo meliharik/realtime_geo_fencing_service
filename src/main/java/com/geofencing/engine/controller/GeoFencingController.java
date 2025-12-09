@@ -5,6 +5,14 @@ import com.geofencing.engine.dto.ZoneViolationRecord;
 import com.geofencing.engine.entity.NoParkingZone;
 import com.geofencing.engine.service.GeoFencingService;
 import com.geofencing.engine.service.ZoneCacheService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +37,7 @@ import java.util.Map;
 @RequestMapping("/api/geofencing")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "Geo-Fencing", description = "Real-time geo-fence violation detection API")
 public class GeoFencingController {
 
     private final GeoFencingService geoFencingService;
@@ -48,8 +57,43 @@ public class GeoFencingController {
      *
      * If the point is inside the sample zone, you'll get a violation response!
      */
+    @Operation(
+            summary = "Check GPS location for violations",
+            description = "Checks if a GPS coordinate violates any no-parking zones. " +
+                    "Uses Redis cache for fast lookups (~0.1-0.5ms) with PostGIS fallback (~5-10ms)."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully checked location",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = {
+                                    @ExampleObject(
+                                            name = "No violation",
+                                            value = "{\"status\":\"OK\",\"message\":\"No violations detected\",\"scooterId\":\"SC-001\",\"location\":{\"latitude\":37.78,\"longitude\":-122.415}}"
+                                    ),
+                                    @ExampleObject(
+                                            name = "Violation detected",
+                                            value = "{\"status\":\"VIOLATION\",\"message\":\"Zone violation detected!\",\"scooterId\":\"SC-001\",\"violations\":[{\"violationId\":\"VIO-123\",\"scooterId\":\"SC-001\",\"zoneId\":1,\"zoneName\":\"Downtown SF\",\"latitude\":37.78,\"longitude\":-122.415,\"timestamp\":\"2024-01-01T12:00:00Z\",\"severity\":\"HIGH\",\"distanceFromBoundary\":0.0}]}"
+                                    )
+                            }
+                    )
+            )
+    })
     @PostMapping("/check")
-    public ResponseEntity<?> checkViolation(@RequestBody GpsEventRecord gpsEvent) {
+    public ResponseEntity<?> checkViolation(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "GPS event with scooter ID, coordinates, and timestamp",
+                    required = true,
+                    content = @Content(
+                            schema = @Schema(implementation = GpsEventRecord.class),
+                            examples = @ExampleObject(
+                                    value = "{\"scooterId\":\"SC-001\",\"latitude\":37.7800,\"longitude\":-122.4150,\"timestamp\":\"2024-01-01T12:00:00Z\"}"
+                            )
+                    )
+            )
+            @RequestBody GpsEventRecord gpsEvent) {
         log.info("Received GPS event: {}", gpsEvent.toLogString());
 
         List<ZoneViolationRecord> violations = geoFencingService.checkZoneViolation(gpsEvent);
@@ -80,11 +124,15 @@ public class GeoFencingController {
      * Example:
      * GET /api/geofencing/check-quick?scooterId=SC-001&lat=37.7800&lon=-122.4150
      */
+    @Operation(
+            summary = "Quick violation check with query params",
+            description = "Simplified endpoint for browser testing. Use query parameters instead of JSON body."
+    )
     @GetMapping("/check-quick")
     public ResponseEntity<?> checkViolationQuick(
-        @RequestParam String scooterId,
-        @RequestParam double lat,
-        @RequestParam double lon
+        @Parameter(description = "Scooter ID", example = "SC-001") @RequestParam String scooterId,
+        @Parameter(description = "Latitude", example = "37.7800") @RequestParam double lat,
+        @Parameter(description = "Longitude", example = "-122.4150") @RequestParam double lon
     ) {
         GpsEventRecord event = new GpsEventRecord(
             scooterId,
@@ -105,6 +153,10 @@ public class GeoFencingController {
      * Example:
      * GET /api/geofencing/zones
      */
+    @Operation(
+            summary = "Get all active no-parking zones",
+            description = "Returns a list of all active geo-fence zones from the database."
+    )
     @GetMapping("/zones")
     public ResponseEntity<List<NoParkingZone>> getAllZones() {
         List<NoParkingZone> zones = geoFencingService.getAllActiveZones();
@@ -117,6 +169,10 @@ public class GeoFencingController {
      * Example:
      * GET /api/geofencing/cache/stats
      */
+    @Operation(
+            summary = "Get Redis cache statistics",
+            description = "Returns cache health metrics including cached zone count and hit rate."
+    )
     @GetMapping("/cache/stats")
     public ResponseEntity<?> getCacheStats() {
         ZoneCacheService.CacheStats stats = zoneCacheService.getCacheStats();

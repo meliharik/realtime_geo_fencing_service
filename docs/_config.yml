@@ -1,0 +1,6 @@
+# GitHub Pages configuration for Jekyll
+theme: jekyll-theme-minimal
+title: Real-Time Geo-Fencing API
+description: High-performance geo-fencing engine for scooter fleet management
+show_downloads: true
+google_analytics: # Add your GA tracking ID here (optional)

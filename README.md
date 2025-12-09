@@ -13,7 +13,7 @@
 
 **A high-performance, event-driven geo-fencing service for processing GPS streams from scooter fleets in real-time**
 
-[Features](#-features) • [Quick Start](#-quick-start) • [Architecture](#-architecture) • [Performance](#-performance) • [API](#-api-documentation)
+[Features](#-features) • [Quick Start](#-quick-start) • [Architecture](#-architecture) • [Performance](#-performance) • [API](#-api-documentation) • [📚 Live Docs](https://meliharik.github.io/realtime_geo_fencing_service/)
 
 </div>
 
@@ -185,6 +185,13 @@ curl "http://localhost:8080/api/geofencing/check-quick?scooterId=SC-002&lat=37.7
 ---
 
 ## 📚 API Documentation
+
+### 🌐 Interactive Documentation
+
+- **📖 Live Docs**: [https://meliharik.github.io/realtime-geo-fencing-service/](https://meliharik.github.io/realtime_geo_fencing_service/)
+- **🔍 Swagger UI**: http://localhost:8080/swagger-ui.html (when running locally)
+- **📄 OpenAPI Spec**: http://localhost:8080/v3/api-docs
+- **🔌 WebSocket Demo**: http://localhost:8080/websocket-test.html
 
 ### Core Endpoints
 

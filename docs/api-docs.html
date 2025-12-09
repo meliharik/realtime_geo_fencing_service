@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation - Real-Time Geo-Fencing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .nav {
+            background: white;
+            padding: 15px 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .nav a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .nav a:hover {
+            color: #764ba2;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 2em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #764ba2;
+            margin: 25px 0 15px 0;
+            font-size: 1.4em;
+        }
+
+        .endpoint {
+            background: #f8f9fa;
+            padding: 20px;
+            border-left: 5px solid #667eea;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .method {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+
+        .method.get { background: #61affe; color: white; }
+        .method.post { background: #49cc90; color: white; }
+        .method.delete { background: #f93e3e; color: white; }
+        .method.put { background: #fca130; color: white; }
+
+        .endpoint-path {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .endpoint-description {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .json { color: #98c379; }
+        .string { color: #e5c07b; }
+        .number { color: #d19a66; }
+        .boolean { color: #56b6c2; }
+        .key { color: #61afef; }
+
+        .response-example {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #667eea;
+            color: white;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .swagger-link {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .swagger-link a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.3em;
+            font-weight: 700;
+            display: block;
+            margin-top: 10px;
+        }
+
+        .swagger-link a:hover {
+            text-decoration: underline;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: #f5f5f5;
+        }
+
+        .try-it-btn {
+            background: #49cc90;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .try-it-btn:hover {
+            background: #3db87a;
+        }
+
+        @media (max-width: 768px) {
+            .endpoint-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📚 API Documentation</h1>
+        <p>Real-Time Geo-Fencing API Reference</p>
+    </div>
+
+    <div class="nav">
+        <a href="index.html">← Home</a>
+        <a href="#rest-api">REST API</a>
+        <a href="#websocket">WebSocket</a>
+        <a href="#examples">Examples</a>
+        <a href="websocket-demo.html">WebSocket Demo</a>
+    </div>
+
+    <div class="container">
+        <div class="swagger-link">
+            <p>🚀 For interactive API testing with "Try it out" functionality:</p>
+            <a href="http://localhost:8080/swagger-ui.html" target="_blank">
+                Open Swagger UI →
+            </a>
+            <p style="font-size: 0.9em; margin-top: 10px; opacity: 0.9;">
+                (Requires the application to be running on localhost:8080)
+            </p>
+        </div>
+
+        <div class="card" id="rest-api">
+            <h2>🔌 REST API Endpoints</h2>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/geofencing/check</span>
+                </div>
+                <p class="endpoint-description">
+                    Check if a GPS coordinate violates any no-parking zones. Uses Redis cache for fast lookups (~0.1-0.5ms)
+                    with PostGIS fallback (~5-10ms).
+                </p>
+
+                <h4>Request Body:</h4>
+                <div class="code-block">{
+  <span class="key">"scooterId"</span>: <span class="string">"SC-001"</span>,
+  <span class="key">"latitude"</span>: <span class="number">37.7800</span>,
+  <span class="key">"longitude"</span>: <span class="number">-122.4150</span>,
+  <span class="key">"timestamp"</span>: <span class="string">"2024-01-01T12:00:00Z"</span>,
+  <span class="key">"speed"</span>: <span class="number">15.5</span>,
+  <span class="key">"battery"</span>: <span class="number">85.0</span>,
+  <span class="key">"heading"</span>: <span class="number">180.0</span>
+}</div>
+
+                <h4>Response (No Violation):</h4>
+                <div class="code-block">{
+  <span class="key">"status"</span>: <span class="string">"OK"</span>,
+  <span class="key">"message"</span>: <span class="string">"No violations detected"</span>,
+  <span class="key">"scooterId"</span>: <span class="string">"SC-001"</span>,
+  <span class="key">"location"</span>: {
+    <span class="key">"latitude"</span>: <span class="number">37.78</span>,
+    <span class="key">"longitude"</span>: <span class="number">-122.415</span>
+  }
+}</div>
+
+                <h4>Response (Violation Detected):</h4>
+                <div class="code-block">{
+  <span class="key">"status"</span>: <span class="string">"VIOLATION"</span>,
+  <span class="key">"message"</span>: <span class="string">"Zone violation detected!"</span>,
+  <span class="key">"scooterId"</span>: <span class="string">"SC-001"</span>,
+  <span class="key">"violations"</span>: [
+    {
+      <span class="key">"violationId"</span>: <span class="string">"VIO-123"</span>,
+      <span class="key">"scooterId"</span>: <span class="string">"SC-001"</span>,
+      <span class="key">"zoneId"</span>: <span class="number">1</span>,
+      <span class="key">"zoneName"</span>: <span class="string">"Downtown SF Test Zone"</span>,
+      <span class="key">"latitude"</span>: <span class="number">37.78</span>,
+      <span class="key">"longitude"</span>: <span class="number">-122.415</span>,
+      <span class="key">"timestamp"</span>: <span class="string">"2024-01-01T12:00:00Z"</span>,
+      <span class="key">"severity"</span>: <span class="string">"HIGH"</span>,
+      <span class="key">"distanceFromBoundary"</span>: <span class="number">0.0</span>
+    }
+  ]
+}</div>
+
+                <h4>cURL Example:</h4>
+                <div class="code-block">curl -X POST http://localhost:8080/api/geofencing/check \
+  -H "Content-Type: application/json" \
+  -d '{
+    "scooterId": "SC-001",
+    "latitude": 37.7800,
+    "longitude": -122.4150,
+    "timestamp": "2024-01-01T12:00:00Z"
+  }'</div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/geofencing/check-quick</span>
+                </div>
+                <p class="endpoint-description">
+                    Quick violation check using query parameters instead of JSON body. Easier for browser testing.
+                </p>
+
+                <h4>Query Parameters:</h4>
+                <table>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Required</th>
+                        <th>Example</th>
+                    </tr>
+                    <tr>
+                        <td>scooterId</td>
+                        <td>String</td>
+                        <td>Yes</td>
+                        <td>SC-001</td>
+                    </tr>
+                    <tr>
+                        <td>lat</td>
+                        <td>Double</td>
+                        <td>Yes</td>
+                        <td>37.7800</td>
+                    </tr>
+                    <tr>
+                        <td>lon</td>
+                        <td>Double</td>
+                        <td>Yes</td>
+                        <td>-122.4150</td>
+                    </tr>
+                </table>
+
+                <h4>Example:</h4>
+                <div class="code-block">GET http://localhost:8080/api/geofencing/check-quick?scooterId=SC-001&lat=37.7800&lon=-122.4150</div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/geofencing/zones</span>
+                </div>
+                <p class="endpoint-description">
+                    Get all active no-parking zones from the database.
+                </p>
+
+                <h4>Response:</h4>
+                <div class="code-block">[
+  {
+    <span class="key">"id"</span>: <span class="number">1</span>,
+    <span class="key">"name"</span>: <span class="string">"Downtown SF Test Zone"</span>,
+    <span class="key">"description"</span>: <span class="string">"No parking zone in downtown SF"</span>,
+    <span class="key">"active"</span>: <span class="boolean">true</span>,
+    <span class="key">"severity"</span>: <span class="string">"HIGH"</span>,
+    <span class="key">"createdAt"</span>: <span class="string">"2024-01-01T00:00:00"</span>,
+    <span class="key">"updatedAt"</span>: <span class="string">"2024-01-01T00:00:00"</span>
+  }
+]</div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/geofencing/cache/stats</span>
+                </div>
+                <p class="endpoint-description">
+                    Get Redis cache statistics and health metrics.
+                </p>
+
+                <h4>Response:</h4>
+                <div class="code-block">{
+  <span class="key">"cachedZoneCount"</span>: <span class="number">5</span>,
+  <span class="key">"databaseZoneCount"</span>: <span class="number">5</span>,
+  <span class="key">"cacheHealthy"</span>: <span class="boolean">true</span>,
+  <span class="key">"cacheHitRate"</span>: <span class="string">"99.5%"</span>
+}</div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/api/geofencing/cache/refresh</span>
+                </div>
+                <p class="endpoint-description">
+                    Manually refresh the Redis cache from the database.
+                </p>
+
+                <h4>Response:</h4>
+                <div class="code-block">{
+  <span class="key">"status"</span>: <span class="string">"SUCCESS"</span>,
+  <span class="key">"message"</span>: <span class="string">"Cache refreshed"</span>,
+  <span class="key">"zonesRefreshed"</span>: <span class="number">5</span>
+}</div>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/api/geofencing/violations/{scooterId}</span>
+                </div>
+                <p class="endpoint-description">
+                    Get violation history for a specific scooter.
+                </p>
+
+                <h4>Example:</h4>
+                <div class="code-block">GET http://localhost:8080/api/geofencing/violations/SC-001</div>
+            </div>
+        </div>
+
+        <div class="card" id="websocket">
+            <h2>🔌 WebSocket API</h2>
+
+            <h3>Connection</h3>
+            <p>Connect to WebSocket endpoint:</p>
+            <div class="code-block">ws://localhost:8080/ws/gps-stream</div>
+
+            <h3>Topics</h3>
+            <table>
+                <tr>
+                    <th>Destination</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>/app/gps</td>
+                    <td>Send</td>
+                    <td>Send single GPS event</td>
+                </tr>
+                <tr>
+                    <td>/app/gps/batch</td>
+                    <td>Send</td>
+                    <td>Send batch GPS events</td>
+                </tr>
+                <tr>
+                    <td>/app/ping</td>
+                    <td>Send</td>
+                    <td>Health check ping</td>
+                </tr>
+                <tr>
+                    <td>/topic/alerts</td>
+                    <td>Subscribe</td>
+                    <td>Receive violation alerts</td>
+                </tr>
+                <tr>
+                    <td>/topic/status</td>
+                    <td>Subscribe</td>
+                    <td>Receive system status updates</td>
+                </tr>
+                <tr>
+                    <td>/user/queue/reply</td>
+                    <td>Subscribe</td>
+                    <td>Receive personal responses</td>
+                </tr>
+            </table>
+
+            <h3>JavaScript Example</h3>
+            <div class="code-block">// 1. Connect to WebSocket
+const socket = new SockJS('http://localhost:8080/ws/gps-stream');
+const stompClient = new StompJs.Client({
+    webSocketFactory: () => socket
+});
+
+// 2. Setup connection handler
+stompClient.onConnect = () => {
+    console.log('Connected to WebSocket');
+
+    // Subscribe to violation alerts
+    stompClient.subscribe('/topic/alerts', (message) => {
+        const alert = JSON.parse(message.body);
+        console.log('🚨 Violation:', alert);
+    });
+
+    // Subscribe to personal replies
+    stompClient.subscribe('/user/queue/reply', (message) => {
+        console.log('Reply:', message.body);
+    });
+};
+
+// 3. Connect
+stompClient.activate();
+
+// 4. Send GPS event
+stompClient.publish({
+    destination: '/app/gps',
+    body: JSON.stringify({
+        scooterId: 'SC-001',
+        latitude: 37.7800,
+        longitude: -122.4150,
+        timestamp: new Date().toISOString()
+    })
+});</div>
+
+            <h3>Try it Live</h3>
+            <p>Use our interactive WebSocket demo to test real-time functionality:</p>
+            <div style="margin-top: 20px;">
+                <a href="websocket-demo.html" class="try-it-btn">Open WebSocket Demo →</a>
+            </div>
+        </div>
+
+        <div class="card" id="examples">
+            <h2>💡 Code Examples</h2>
+
+            <h3>Python Example</h3>
+            <div class="code-block">import requests
+import json
+
+# Check GPS location for violations
+url = "http://localhost:8080/api/geofencing/check"
+payload = {
+    "scooterId": "SC-001",
+    "latitude": 37.7800,
+    "longitude": -122.4150,
+    "timestamp": "2024-01-01T12:00:00Z"
+}
+
+response = requests.post(url, json=payload)
+result = response.json()
+
+if result["status"] == "VIOLATION":
+    print(f"🚨 Violation detected: {result['violations']}")
+else:
+    print("✅ No violations")</div>
+
+            <h3>Java Example</h3>
+            <div class="code-block">RestTemplate restTemplate = new RestTemplate();
+String url = "http://localhost:8080/api/geofencing/check";
+
+GpsEventRecord event = new GpsEventRecord(
+    "SC-001",
+    37.7800,
+    -122.4150,
+    Instant.now(),
+    null, null, null
+);
+
+ResponseEntity<Map> response = restTemplate.postForEntity(
+    url,
+    event,
+    Map.class
+);
+
+System.out.println(response.getBody());</div>
+
+            <h3>Node.js Example</h3>
+            <div class="code-block">const axios = require('axios');
+
+async function checkViolation() {
+    const response = await axios.post('http://localhost:8080/api/geofencing/check', {
+        scooterId: 'SC-001',
+        latitude: 37.7800,
+        longitude: -122.4150,
+        timestamp: new Date().toISOString()
+    });
+
+    console.log(response.data);
+}
+
+checkViolation();</div>
+        </div>
+    </div>
+</body>
+</html>

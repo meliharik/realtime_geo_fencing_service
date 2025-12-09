@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket GPS Streaming Test Client</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section h2 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-badge.connected {
+            background: #10b981;
+            color: white;
+        }
+
+        .status-badge.disconnected {
+            background: #ef4444;
+            color: white;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .log-container {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        .log-entry {
+            padding: 8px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            line-height: 1.6;
+        }
+
+        .log-entry.info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .log-entry.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .log-entry.warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .log-entry.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .log-entry .timestamp {
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .card h3 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .stats-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .stats-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🌍 Real-Time GPS Streaming Test Client</h1>
+        <p>WebSocket + STOMP Protocol Testing Interface</p>
+    </div>
+
+    <div class="content">
+        <!-- Connection Section -->
+        <div class="section">
+            <h2>
+                🔌 Connection
+                <span id="status-badge" class="status-badge disconnected">Disconnected</span>
+            </h2>
+            <div class="controls">
+                <button class="btn-primary" onclick="connect()">Connect</button>
+                <button class="btn-danger" onclick="disconnect()">Disconnect</button>
+                <button class="btn-secondary" onclick="ping()">Ping</button>
+            </div>
+        </div>
+
+        <!-- GPS Event Section -->
+        <div class="section">
+            <h2>📍 Send GPS Event</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Scooter Information</h3>
+                    <div class="form-group">
+                        <label>Scooter ID</label>
+                        <input type="text" id="scooterId" value="SC-TEST-001" placeholder="SC-001">
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>GPS Coordinates</h3>
+                    <div class="form-group">
+                        <label>Latitude</label>
+                        <input type="number" id="latitude" value="37.7800" step="0.0001" placeholder="37.7800">
+                    </div>
+                    <div class="form-group">
+                        <label>Longitude</label>
+                        <input type="number" id="longitude" value="-122.4150" step="0.0001" placeholder="-122.4150">
+                    </div>
+                </div>
+            </div>
+            <div class="controls" style="margin-top: 15px;">
+                <button class="btn-success" onclick="sendGpsEvent()">Send GPS Event</button>
+                <button class="btn-primary" onclick="sendTestViolation()">Send Test Violation (Inside Zone)</button>
+                <button class="btn-secondary" onclick="sendTestNoViolation()">Send No Violation (Outside Zone)</button>
+            </div>
+        </div>
+
+        <!-- Statistics Section -->
+        <div class="section">
+            <h2>📊 Statistics</h2>
+            <div class="grid">
+                <div class="card">
+                    <div class="stats">
+                        <span class="stats-label">Messages Sent</span>
+                        <span class="stats-value" id="messagesSent">0</span>
+                    </div>
+                    <div class="stats">
+                        <span class="stats-label">Messages Received</span>
+                        <span class="stats-value" id="messagesReceived">0</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="stats">
+                        <span class="stats-label">Violations Detected</span>
+                        <span class="stats-value" id="violationsDetected">0</span>
+                    </div>
+                    <div class="stats">
+                        <span class="stats-label">Connection Time</span>
+                        <span class="stats-value" id="connectionTime">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Logs Section -->
+        <div class="section">
+            <h2>📝 Activity Log</h2>
+            <button class="btn-secondary" onclick="clearLogs()" style="margin-bottom: 10px;">Clear Logs</button>
+            <div id="logs" class="log-container">
+                <div class="log-entry info">
+                    <span class="timestamp">[READY]</span>
+                    <span>Click "Connect" to start WebSocket connection</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SockJS and STOMP libraries -->
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7/bundles/stomp.umd.min.js"></script>
+
+<script>
+    let stompClient = null;
+    let messagesSent = 0;
+    let messagesReceived = 0;
+    let violationsDetected = 0;
+    let connectionStartTime = null;
+
+    function connect() {
+        const socket = new SockJS('http://localhost:8080/ws/gps-stream');
+        stompClient = new StompJs.Client({
+            webSocketFactory: () => socket,
+            debug: (str) => {
+                console.log('STOMP: ' + str);
+            },
+            reconnectDelay: 5000,
+            heartbeatIncoming: 4000,
+            heartbeatOutgoing: 4000,
+        });
+
+        stompClient.onConnect = (frame) => {
+            log('Connected to WebSocket server!', 'success');
+            updateStatus(true);
+            connectionStartTime = new Date();
+            updateConnectionTime();
+
+            // Subscribe to public alerts
+            stompClient.subscribe('/topic/alerts', (message) => {
+                const alert = JSON.parse(message.body);
+                log(`🚨 VIOLATION ALERT: Scooter ${alert.scooterId} entered ${alert.zoneName} (${alert.severity})`, 'warning');
+                violationsDetected++;
+                updateStats();
+                messagesReceived++;
+            });
+
+            // Subscribe to private replies
+            stompClient.subscribe('/user/queue/reply', (message) => {
+                const reply = JSON.parse(message.body);
+                log(`✅ ACK: ${JSON.stringify(reply)}`, 'success');
+                messagesReceived++;
+                updateStats();
+            });
+
+            // Subscribe to private notifications
+            stompClient.subscribe('/user/queue/notifications', (message) => {
+                const notification = JSON.parse(message.body);
+                log(`📢 NOTIFICATION: ${notification.message}`, 'warning');
+                messagesReceived++;
+                updateStats();
+            });
+
+            // Subscribe to errors
+            stompClient.subscribe('/user/queue/errors', (message) => {
+                const error = JSON.parse(message.body);
+                log(`❌ ERROR: ${error.message}`, 'error');
+                messagesReceived++;
+                updateStats();
+            });
+        };
+
+        stompClient.onWebSocketError = (error) => {
+            log('WebSocket error: ' + error, 'error');
+            updateStatus(false);
+        };
+
+        stompClient.onStompError = (frame) => {
+            log('STOMP error: ' + frame.headers['message'], 'error');
+            log('Details: ' + frame.body, 'error');
+        };
+
+        stompClient.activate();
+    }
+
+    function disconnect() {
+        if (stompClient !== null) {
+            stompClient.deactivate();
+            log('Disconnected from server', 'info');
+            updateStatus(false);
+            connectionStartTime = null;
+            updateConnectionTime();
+        }
+    }
+
+    function sendGpsEvent() {
+        if (stompClient && stompClient.connected) {
+            const gpsEvent = {
+                scooterId: document.getElementById('scooterId').value,
+                latitude: parseFloat(document.getElementById('latitude').value),
+                longitude: parseFloat(document.getElementById('longitude').value),
+                timestamp: new Date().toISOString(),
+                speed: null,
+                heading: null,
+                accuracy: null
+            };
+
+            stompClient.publish({
+                destination: '/app/gps',
+                body: JSON.stringify(gpsEvent)
+            });
+
+            log(`📡 Sent GPS: ${gpsEvent.scooterId} @ (${gpsEvent.latitude}, ${gpsEvent.longitude})`, 'info');
+            messagesSent++;
+            updateStats();
+        } else {
+            log('❌ Not connected! Click "Connect" first.', 'error');
+        }
+    }
+
+    function sendTestViolation() {
+        // Inside test zone: Downtown SF (37.78, -122.415)
+        document.getElementById('latitude').value = '37.7800';
+        document.getElementById('longitude').value = '-122.4150';
+        sendGpsEvent();
+    }
+
+    function sendTestNoViolation() {
+        // Outside test zone
+        document.getElementById('latitude').value = '37.7700';
+        document.getElementById('longitude').value = '-122.4000';
+        sendGpsEvent();
+    }
+
+    function ping() {
+        if (stompClient && stompClient.connected) {
+            stompClient.publish({
+                destination: '/app/ping',
+                body: '{}'
+            });
+            log('🏓 Ping sent', 'info');
+            messagesSent++;
+            updateStats();
+        } else {
+            log('❌ Not connected!', 'error');
+        }
+    }
+
+    function log(message, type = 'info') {
+        const logsDiv = document.getElementById('logs');
+        const entry = document.createElement('div');
+        entry.className = `log-entry ${type}`;
+
+        const timestamp = new Date().toLocaleTimeString();
+        entry.innerHTML = `<span class="timestamp">[${timestamp}]</span><span>${message}</span>`;
+
+        logsDiv.appendChild(entry);
+        logsDiv.scrollTop = logsDiv.scrollHeight;
+    }
+
+    function clearLogs() {
+        document.getElementById('logs').innerHTML = '';
+        log('Logs cleared', 'info');
+    }
+
+    function updateStatus(connected) {
+        const badge = document.getElementById('status-badge');
+        if (connected) {
+            badge.textContent = 'Connected';
+            badge.className = 'status-badge connected';
+        } else {
+            badge.textContent = 'Disconnected';
+            badge.className = 'status-badge disconnected';
+        }
+    }
+
+    function updateStats() {
+        document.getElementById('messagesSent').textContent = messagesSent;
+        document.getElementById('messagesReceived').textContent = messagesReceived;
+        document.getElementById('violationsDetected').textContent = violationsDetected;
+    }
+
+    function updateConnectionTime() {
+        if (connectionStartTime) {
+            const now = new Date();
+            const diff = Math.floor((now - connectionStartTime) / 1000);
+            const minutes = Math.floor(diff / 60);
+            const seconds = diff % 60;
+            document.getElementById('connectionTime').textContent = `${minutes}m ${seconds}s`;
+            setTimeout(updateConnectionTime, 1000);
+        } else {
+            document.getElementById('connectionTime').textContent = '-';
+        }
+    }
+
+    // Log ready state
+    console.log('WebSocket test client loaded. Ready to connect.');
+</script>
+</body>
+</html>
