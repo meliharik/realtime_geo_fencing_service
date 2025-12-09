@@ -34,10 +34,12 @@ Imagine a city with designated no-parking zones for electric scooters. This syst
 ### 🌟 Features
 
 - ✅ **Real-Time Detection** - Processes 50,000+ GPS events per second
+- ✅ **WebSocket Streaming** - Real-time GPS data streaming with STOMP protocol
 - ✅ **Spatial Queries** - PostGIS with GiST indexes for O(log n) performance
 - ✅ **Redis Caching** - 50x performance boost with in-memory polygon checks
 - ✅ **Rate Limiting** - Prevents duplicate alerts (99.7% reduction in DB writes)
-- ✅ **Event-Driven** - Async processing with Spring's @Async
+- ✅ **Pub/Sub Messaging** - Broadcast alerts to multiple subscribers
+- ✅ **CI/CD Pipeline** - GitHub Actions with automated testing & deployment
 - ✅ **Production-Ready** - Docker Compose, health checks, metrics
 - ✅ **Clean Architecture** - SOLID principles, DTOs, repository pattern
 - ✅ **Java 17 Features** - Records, text blocks, pattern matching
@@ -234,6 +236,58 @@ GET /api/geofencing/violations/{scooterId}
 ```
 
 Returns violation history for a specific scooter.
+
+### WebSocket API (Real-Time Streaming)
+
+#### Connect to WebSocket
+```
+ws://localhost:8080/ws/gps-stream
+```
+
+#### Send GPS Event
+```javascript
+// Connect
+const socket = new SockJS('http://localhost:8080/ws/gps-stream');
+const stompClient = new StompJs.Client({
+    webSocketFactory: () => socket
+});
+
+stompClient.onConnect = () => {
+    // Subscribe to alerts
+    stompClient.subscribe('/topic/alerts', (message) => {
+        const alert = JSON.parse(message.body);
+        console.log('Violation Alert:', alert);
+    });
+
+    // Send GPS event
+    stompClient.publish({
+        destination: '/app/gps',
+        body: JSON.stringify({
+            scooterId: 'SC-001',
+            latitude: 37.7800,
+            longitude: -122.4150,
+            timestamp: new Date().toISOString()
+        })
+    });
+};
+
+stompClient.activate();
+```
+
+#### Available Topics
+- `/app/gps` - Send GPS events (client → server)
+- `/app/gps/batch` - Send multiple GPS events
+- `/app/ping` - Health check
+- `/topic/alerts` - Subscribe to violation alerts (server → all clients)
+- `/user/queue/reply` - Private acknowledgments (server → specific client)
+
+#### Test WebSocket
+Open the interactive test client:
+```
+http://localhost:8080/websocket-test.html
+```
+
+For complete WebSocket documentation, see [WEBSOCKET_GUIDE.md](WEBSOCKET_GUIDE.md)
 
 ---
 

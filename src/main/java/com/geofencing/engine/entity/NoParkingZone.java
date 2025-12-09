@@ -1,5 +1,6 @@
 package com.geofencing.engine.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -58,7 +59,11 @@ public class NoParkingZone {
      * - SRID 4326 = WGS84 coordinate system (standard GPS coordinates)
      * - columnDefinition ensures PostGIS understands the geometry type
      * - A GiST spatial index will be created on this column via migration script
+     *
+     * @JsonIgnore prevents infinite recursion during JSON serialization
+     * as JTS Geometry objects contain circular references
      */
+    @JsonIgnore
     @Column(name = "geometry", columnDefinition = "geometry(Polygon,4326)", nullable = false)
     private Polygon geometry;
 
